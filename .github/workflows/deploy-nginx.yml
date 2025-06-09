@@ -1,0 +1,28 @@
+name: Deploy NGINX on EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: SSH and run NGINX setup
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          sudo apt update
+          sudo apt install nginx -y
+          echo "<h1>This EC2 instance is deployed successfully and NGINX is working</h1><p>Maintained by DevOps Engineering Vikesh Sagar Bairam</p>" | sudo tee /var/www/html/index.html
+          sudo systemctl enable nginx
+          sudo systemctl start nginx
+
